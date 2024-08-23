@@ -96,7 +96,7 @@ def process_template(LANG, shield_type):
     for index, row in data.iterrows():
         tag_no = row['Instrument tag no']
 
-        if index < 3 and (row['Serial number'] == row['Serial number'] or not ONLY_WITH_SERIAL_NUMBERS):
+        if index < 5 and (row['Serial number'] == row['Serial number'] or not ONLY_WITH_SERIAL_NUMBERS):
 
             doc = corel.OpenDocument(cdr_file)
             
@@ -134,8 +134,8 @@ def process_template(LANG, shield_type):
                     page.Shapes.First.Fill.ApplyNoFill()
                     page.Shapes.First.Outline.Width = 0.003
 
-                pyperclip.copy(os.path.join(output_folder, f"{tag_no}_{shield_type_text}_{LANG}.ai"))
-                input("Ожидание сохранения файла...")
+            pyperclip.copy(os.path.join(output_folder, f"{tag_no}_{shield_type_text}_{LANG}.ai"))
+            input("Ожидание сохранения файла...")
             # Закрытие файла
             ##############################################################################
             doc.Close()
@@ -143,8 +143,8 @@ def process_template(LANG, shield_type):
             print(f"{str(index+1)}/{str(data.shape[0])}. Осталось {str((interval * (data.shape[0] - (index + 1)))/60)[0:5]} мин. Итерация: {str(interval)[0:5]} сек..")
 
 corel.Visible = True
-process_template('rus', SHIELD_WITH_QR)
-process_template('eng', SHIELD_WITH_QR)
-# corel.Visible = False
-# process_template('rus', SHIELD_WITHOUT_QR)
-# process_template('eng', SHIELD_WITHOUT_QR)
+# process_template('rus', SHIELD_WITH_QR)
+# process_template('eng', SHIELD_WITH_QR)
+
+process_template('rus', SHIELD_WITHOUT_QR)
+process_template('eng', SHIELD_WITHOUT_QR)
