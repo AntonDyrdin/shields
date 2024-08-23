@@ -16,14 +16,11 @@ from utils import generate_qr_code, wrap_text
 # распихать по папкам в новом порядке
 
 LANG = 'eng'
-LANG_RUS = 'инг' if LANG == 'eng' else 'рус'
 SHIELD_WITHOUT_QR = 1
 SHIELD_WITH_QR = 2
-shield_type = SHIELD_WITH_QR
-shield_type_text = "small" if shield_type == SHIELD_WITH_QR else "big"
-MAX_TEXT_WIDTH = 4.330688976377953 if shield_type == SHIELD_WITHOUT_QR else 4.724389763779527
+
 MAX_LINE_LENGTH = 50
-SHOW_UI = shield_type == SHIELD_WITH_QR
+
 ONLY_WITH_SERIAL_NUMBERS = True
 
 # секундомер
@@ -36,7 +33,7 @@ def getTime():
     return offset
 #####################################
 
-def get_text(row, max_width):
+def get_text(shield_type, LANG, row, max_width):
     text = ''
     number_key = 'Код модели' if LANG == 'rus' else 'Model number'
     model_number = row[number_key]
@@ -80,11 +77,18 @@ def get_text(row, max_width):
     
     return text
 
-def process_template(cdr_file, xlsx_file, output_folder):
-    data = pd.read_excel(xlsx_file)
+corel = win32com.client.gencache.EnsureDispatch("CorelDRAW.Application")
+
+def process_template(LANG, shield_type):
+    LANG_RUS = 'инг' if LANG == 'eng' else 'рус'
+    shield_type_text = "small" if shield_type == SHIELD_WITH_QR else "big"
+    MAX_TEXT_WIDTH = 4.330688976377953 if shield_type == SHIELD_WITHOUT_QR else 4.724389763779527
     
-    corel = win32com.client.gencache.EnsureDispatch("CorelDRAW.Application")
-    corel.Visible = SHOW_UI
+    cdr_file =  f"D:\dev\shields\шильд тип {shield_type} {LANG_RUS}\шильд тип {shield_type} {LANG_RUS} ( текст еще не в кривых).cdr"
+    xlsx_file = "dataset.xlsx"
+    output_folder = f"D:\dev\shields\Type {shield_type}\{LANG.upper()}"
+
+    data = pd.read_excel(xlsx_file)
     
     getTime()
     # Главный цикл
@@ -92,31 +96,21 @@ def process_template(cdr_file, xlsx_file, output_folder):
     for index, row in data.iterrows():
         tag_no = row['Instrument tag no']
 
-        if row['Serial number'] == row['Serial number'] or not ONLY_WITH_SERIAL_NUMBERS:
-            # try:
-            #     src = open(cdr_file, 'rb')
-            #     dst = open(os.path.join(output_folder, f"{tag_no}_{shield_type_text}_{LANG}.cdr"), 'wb')
-            #     try:
-            #         dst.write(src.read())
-            #     finally:
-            #         dst.close()
-            # finally:
-            #     src.close()
+        if index < 3 and (row['Serial number'] == row['Serial number'] or not ONLY_WITH_SERIAL_NUMBERS):
 
-            # doc = corel.OpenDocument(os.path.join(output_folder, f"{tag_no}_{shield_type_text}_{LANG}.cdr"))
             doc = corel.OpenDocument(cdr_file)
             
             for page in doc.Pages:
                 for shape in page.Shapes:
                     if shape.Type == 6:                        
                         max_line_length = MAX_LINE_LENGTH
-                        shape.Text.Story.Text = get_text(row, max_line_length)
+                        shape.Text.Story.Text = get_text(shield_type, LANG,row, max_line_length)
 
                         while shape.SizeWidth > MAX_TEXT_WIDTH:
                             if max_line_length < 20:
                                 raise Exception('max_line_length = ' + str(max_line_length) + ' !')
                             max_line_length -= 1
-                            shape.Text.Story.Text = get_text(row, max_line_length)
+                            shape.Text.Story.Text = get_text(shield_type, LANG,row, max_line_length)
 
                         if shape.SizeWidth > MAX_TEXT_WIDTH:
                             raise Exception('shape.SizeWidth > MAX_TEXT_WIDTH !')
@@ -144,13 +138,13 @@ def process_template(cdr_file, xlsx_file, output_folder):
                 input("Ожидание сохранения файла...")
             # Закрытие файла
             ##############################################################################
-            # doc.Save()
             doc.Close()
-            # os.remove(os.path.join(output_folder, f"Резервная_копия_{tag_no}_{shield_type_text}_{LANG}.cdr"))
-            print(f"{str(index+1)}/{str(data.shape[0])}. Осталось {str((getTime() * (data.shape[0] - (index + 1)))/60)[0:5]} мин. Итерация: {str(getTime())[0:5]} сек..")
+            interval = getTime()
+            print(f"{str(index+1)}/{str(data.shape[0])}. Осталось {str((interval * (data.shape[0] - (index + 1)))/60)[0:5]} мин. Итерация: {str(interval)[0:5]} сек..")
 
-cdr_file =  f"D:\dev\shields\шильд тип {shield_type} {LANG_RUS}\шильд тип {shield_type} {LANG_RUS} ( текст еще не в кривых).cdr"
-xlsx_file = "dataset.xlsx"
-output_folder = f"D:\dev\shields\Type {shield_type}\{LANG.upper()}"
-
-process_template(cdr_file, xlsx_file, output_folder)
+corel.Visible = True
+process_template('rus', SHIELD_WITH_QR)
+process_template('eng', SHIELD_WITH_QR)
+# corel.Visible = False
+# process_template('rus', SHIELD_WITHOUT_QR)
+# process_template('eng', SHIELD_WITHOUT_QR)
