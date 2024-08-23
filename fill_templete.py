@@ -47,7 +47,7 @@ def get_text(shield_type, LANG, row, max_width):
             text += f"Protective class: {row['Protective Class']}\r" if row['Protective Class'] == row['Protective Class'] else f"Protective class:"
             text += f"Climatic version: {row['Climatic version']}\r" if row['Climatic version'] == row['Climatic version'] else f"Climatic version:"
             text += f"Purchase order number: {row['Purchase order number']}\r" if row['Purchase order number'] == row['Purchase order number'] else f"Purchase order number"
-            text += f"Serial number: {row['Serial number']}" if row['Serial number'] == row['Serial number'] else f"Serial number:"
+            text += f"Serial number: {str(row['Serial number']).replace('.0','')}" if row['Serial number'] == row['Serial number'] else f"Serial number:"
         
         else:
             # Type 1 RUS
@@ -57,7 +57,7 @@ def get_text(shield_type, LANG, row, max_width):
             text += f"Степень защиты: {row['Степень защиты']}\r" if row['Степень защиты'] == row['Степень защиты'] else f"Степень защиты:"
             text += f"Климатическое исполнение: {row['Климатическое исполнение']}\r" if row['Климатическое исполнение'] == row['Климатическое исполнение'] else f"Климатическое исполнение:"
             text += f"Номер заказа: {row['Номер заказа']}\r" if row['Номер заказа'] == row['Номер заказа'] else f"Номер заказа"
-            text += f"Серийный номер: {row['Серийный номер']}" if row['Серийный номер'] == row['Серийный номер'] else f"Серийный номер:"
+            text += f"Серийный номер: {str(row['Серийный номер']).replace('.0','')}" if row['Серийный номер'] == row['Серийный номер'] else f"Серийный номер:"
     
     if shield_type == SHIELD_WITH_QR:
         if LANG == 'eng':
@@ -89,7 +89,14 @@ def process_template(LANG, shield_type):
     output_folder = f"D:\dev\shields\Type {shield_type}\{LANG.upper()}"
 
     data = pd.read_excel(xlsx_file)
-    
+    count = data.shape[0]
+    if ONLY_WITH_SERIAL_NUMBERS:
+        count = 0
+        for index, row in data.iterrows():
+            if row['Serial number'] == row['Serial number']:
+                count += 1
+
+
     getTime()
     # Главный цикл
     ##############################################################################
@@ -100,6 +107,7 @@ def process_template(LANG, shield_type):
 
             doc = corel.OpenDocument(cdr_file)
             
+            found = False
             for page in doc.Pages:
                 for shape in page.Shapes:
                     if shape.Type == 6:                        
@@ -117,6 +125,10 @@ def process_template(LANG, shield_type):
                         
                         shape.Fill.ApplyNoFill()
                         shape.Outline.Width = 0.003
+
+                        found = True
+            if found == False:
+                raise Exception('found == False!')
 
             doc.ActivePage.Shapes.All().ConvertToCurves()
             
@@ -140,11 +152,11 @@ def process_template(LANG, shield_type):
             ##############################################################################
             doc.Close()
             interval = getTime()
-            print(f"{str(index+1)}/{str(data.shape[0])}. Осталось {str((interval * (data.shape[0] - (index + 1)))/60)[0:5]} мин. Итерация: {str(interval)[0:5]} сек..")
+            print(f"{str(index+1)}/{str(count)}. Осталось {str((interval * (count - (index + 1)))/60)[0:5]} мин. Итерация: {str(interval)[0:5]} сек..")
 
 corel.Visible = True
 # process_template('rus', SHIELD_WITH_QR)
-# process_template('eng', SHIELD_WITH_QR)
+process_template('eng', SHIELD_WITH_QR)
 
-process_template('rus', SHIELD_WITHOUT_QR)
-process_template('eng', SHIELD_WITHOUT_QR)
+# process_template('rus', SHIELD_WITHOUT_QR)
+# process_template('eng', SHIELD_WITHOUT_QR)
