@@ -1,5 +1,5 @@
 *.svg
-# *.ai
-# *.cdr
+*.ai
+*.cdr
 *.rar
 *.pyc

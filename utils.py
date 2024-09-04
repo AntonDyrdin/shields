@@ -20,7 +20,7 @@ def generate_qr_code(data):
 
     img.save(f"qr_codes/{data}.svg")
 
-    return os.path.join("D:\dev\shields\qr_codes", f"{data}.svg")
+    return os.path.join(f"{os.getcwd()}\qr_codes", f"{data}.svg")
 
 def wrap_text(text, max_width, strict_single_line=False, spaced_dashes_already_replaced=False):
     lines = []

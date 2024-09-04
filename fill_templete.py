@@ -11,7 +11,7 @@ SHIELD_WITH_QR = 2
 
 MAX_LINE_LENGTH = 50
 
-ONLY_WITH_SERIAL_NUMBERS = False
+ONLY_WITH_SERIAL_NUMBERS = True
 
 # секундомер
 import time
@@ -74,9 +74,9 @@ def process_template(LANG, shield_type):
     shield_type_text = "small" if shield_type == SHIELD_WITH_QR else "big"
     MAX_TEXT_WIDTH = 4.330688976377953 if shield_type == SHIELD_WITHOUT_QR else 4.724389763779527
     
-    cdr_file =  f"D:\dev\shields\шильд тип {shield_type} {LANG_RUS}\шильд тип {shield_type} {LANG_RUS} ( текст еще не в кривых).cdr"
+    cdr_file =  f"{os.getcwd()}\шильд тип {shield_type} {LANG_RUS}\шильд тип {shield_type} {LANG_RUS} ( текст еще не в кривых).cdr"
     xlsx_file = "dataset.xlsx"
-    output_folder = f"D:\dev\shields\Type {shield_type}\{LANG.upper()}"
+    output_folder = f"{os.getcwd()}\Type {shield_type}\{LANG.upper()}"
 
     data = pd.read_excel(xlsx_file)
     count = data.shape[0]
@@ -134,7 +134,7 @@ def process_template(LANG, shield_type):
                 qr_tag_no = row['TAG номера для QR-codes (на QR-код наносить их!!!!)']
                 generate_qr_code(qr_tag_no)
                 
-                pyperclip.copy(os.path.join("D:\dev\shields\qr_codes", f"{qr_tag_no}.svg"))
+                pyperclip.copy(os.path.join(f"{os.getcwd()}\qr_codes", f"{qr_tag_no}.svg"))
                 
                 input("Ожидание импорта QR кода...")
             
@@ -150,12 +150,12 @@ def process_template(LANG, shield_type):
             ##############################################################################
             doc.Close()
             interval = getTime()
-            # print(f"{str(counter + 1)}/{str(count)}. Осталось {str((interval * (count - (counter + 1)))/60)[0:5]} мин. Итерация: {str(interval)[0:5]} сек..")
+            print(f"{str(counter)}/{str(count)}. Осталось {str((interval * (count - (counter)))/60)[0:5]} мин. Итерация: {str(interval)[0:5]} сек..")
             # print(row['Instrument tag no'])
             # print(row['Instrument service'])
             # print("index: "+ str(index*7))
 
-corel.Visible = False
+corel.Visible = True
 process_template('rus', SHIELD_WITH_QR)
 process_template('eng', SHIELD_WITH_QR)
 
