@@ -1,6 +1,7 @@
 import os
 import qrcode
 import qrcode.image.svg
+# regex
 import re
 
 def generate_qr_code(data):
@@ -53,7 +54,6 @@ def wrap_text(text, max_width, strict_single_line=False, spaced_dashes_already_r
         if spaced_dashes_already_replaced:
             print("Не удалось вместить текст: " + text)
         else:
-            print(wrap_text(text.replace(' - ', '-'), max_width, True, spaced_dashes_already_replaced=True))
             return wrap_text(text.replace(' - ', '-'), max_width, True, spaced_dashes_already_replaced=True)
         
     return "\r".join(lines)
