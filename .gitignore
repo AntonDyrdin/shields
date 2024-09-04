@@ -1,2 +1,5 @@
-.svg
-.ai
+*.svg
+*.ai
+*.cdr
+*.rar
+*.pyc

@@ -21,7 +21,7 @@ def generate_qr_code(data):
 
     return os.path.join("D:\dev\shields\qr_codes", f"{data}.svg")
 
-def wrap_text(text, max_width):
+def wrap_text(text, max_width, strict_single_line=False, spaced_dashes_already_replaced=False):
     lines = []
     words = re.split(r'( +|-)', text)
 
@@ -45,7 +45,15 @@ def wrap_text(text, max_width):
     if current_line:
         lines.append(current_line.strip().replace('\n', '\r'))
         
-    for line in lines:
-        print('"' +line+'"')
-    print('')
+    # for line in lines:
+        # print('"' +line+'"')
+    # print('')
+    
+    if strict_single_line and len(lines) > 1:
+        if spaced_dashes_already_replaced:
+            print("Не удалось вместить текст: " + text)
+        else:
+            print(wrap_text(text.replace(' - ', '-'), max_width, True, spaced_dashes_already_replaced=True))
+            return wrap_text(text.replace(' - ', '-'), max_width, True, spaced_dashes_already_replaced=True)
+        
     return "\r".join(lines)

@@ -4,24 +4,13 @@ import os
 import pyperclip
 from utils import generate_qr_code, wrap_text
 
-# подправить слово "Диаозон"  в русских шильдах. Разумеется на Диапозон.
-
-# когда делаешь экспорт в аи появляется вот это окошко
-# у тебя скорее всего стоит один из AI CS
-# нужно чтобы было Adobe Illustrator 3JP
-
-# При создании QR-кодов убирать ТИРЕ и ДЕФИСЫ в TAG номерах. Пример , в таблице : 2714-PG-469 . А QR-код должен быть 2714PG469.
-# Таблички делаем только на то, на что есть серийный номер, таких 420 комплектов. Остальные позже как придут с завода изготовителя.
-
-# распихать по папкам в новом порядке
-
 LANG = 'eng'
 SHIELD_WITHOUT_QR = 1
 SHIELD_WITH_QR = 2
 
 MAX_LINE_LENGTH = 50
 
-ONLY_WITH_SERIAL_NUMBERS = True
+ONLY_WITH_SERIAL_NUMBERS = False
 
 # секундомер
 import time
@@ -63,14 +52,14 @@ def get_text(shield_type, LANG, row, max_width):
         if LANG == 'eng':
             # Type 2 ENG
             text = f"Instrument tag no: {row['Instrument tag no']}\r" if row['Instrument tag no'] == row['Instrument tag no'] else f"Instrument tag no:"
-            text += wrap_text(f"Instrument service: {row['Instrument service']}", max_width) + '\r' if row['Instrument service'] == row['Instrument service'] else f"Instrument service:"
+            text += wrap_text(f"Instrument service: {row['Instrument service']}", max_width, strict_single_line=True, spaced_dashes_already_replaced=False) + '\r' if row['Instrument service'] == row['Instrument service'] else f"Instrument service:"
             text += wrap_text(f"Measured media: {row['Measured Media']}", max_width) + '\r' if row['Measured Media'] == row['Measured Media'] else f"Measured media:"
             text += f"Calibrated range: {row['Calibrated range']}\r" if row['Calibrated range'] == row['Calibrated range'] else f"Calibrated range:"
         
         else:
             # Type 2 RUS
             text = f"Номер позиции: {row['Номер позиции']}\r" if row['Номер позиции'] == row['Номер позиции'] else f"Номер позиции:"
-            text += wrap_text(f"Функция: {row['Функция']}", max_width) + '\r' if row['Функция'] == row['Функция'] else f"Функция:"
+            text += wrap_text(f"Функция: {row['Функция']}", max_width, strict_single_line=True, spaced_dashes_already_replaced=False) + '\r' if row['Функция'] == row['Функция'] else f"Функция:"
             text += wrap_text(f"Измеряемая среда: {row['Измеряемая среда']}", max_width) + '\r' if row['Измеряемая среда'] == row['Измеряемая среда'] else f"Измеряемая среда:"
             text += f"Диапазон измерения: {row['Диапазон измерения']}\r" if row['Диапазон измерения'] == row['Диапазон измерения'] else f"Диапазон измерения:"
     
@@ -100,10 +89,17 @@ def process_template(LANG, shield_type):
     getTime()
     # Главный цикл
     ##############################################################################
+    # doc = corel.OpenDocument(cdr_file)
+    counter = 0
     for index, row in data.iterrows():
+    # index = 0
+    # while counter < 10:
+    #     row = data.iloc[index*7]
+    #     index += 1
         tag_no = row['Instrument tag no']
 
-        if index < 5 and (row['Serial number'] == row['Serial number'] or not ONLY_WITH_SERIAL_NUMBERS):
+        if (row['Serial number'] == row['Serial number'] or not ONLY_WITH_SERIAL_NUMBERS):
+            counter += 1
 
             doc = corel.OpenDocument(cdr_file)
             
@@ -134,9 +130,10 @@ def process_template(LANG, shield_type):
             
             if shield_type == SHIELD_WITH_QR:
 
-                generate_qr_code(tag_no.replace('-',''))
+                qr_tag_no = row['TAG номера для QR-codes (на QR-код наносить их!!!!)']
+                generate_qr_code(qr_tag_no)
                 
-                pyperclip.copy(os.path.join("D:\dev\shields\qr_codes", f"{tag_no.replace('-','')}.svg"))
+                pyperclip.copy(os.path.join("D:\dev\shields\qr_codes", f"{qr_tag_no}.svg"))
                 
                 input("Ожидание импорта QR кода...")
             
@@ -152,10 +149,13 @@ def process_template(LANG, shield_type):
             ##############################################################################
             doc.Close()
             interval = getTime()
-            print(f"{str(index+1)}/{str(count)}. Осталось {str((interval * (count - (index + 1)))/60)[0:5]} мин. Итерация: {str(interval)[0:5]} сек..")
+            # print(f"{str(counter + 1)}/{str(count)}. Осталось {str((interval * (count - (counter + 1)))/60)[0:5]} мин. Итерация: {str(interval)[0:5]} сек..")
+            # print(row['Instrument tag no'])
+            # print(row['Instrument service'])
+            # print("index: "+ str(index*7))
 
-corel.Visible = True
-# process_template('rus', SHIELD_WITH_QR)
+corel.Visible = False
+process_template('rus', SHIELD_WITH_QR)
 process_template('eng', SHIELD_WITH_QR)
 
 # process_template('rus', SHIELD_WITHOUT_QR)
