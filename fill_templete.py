@@ -67,7 +67,7 @@ def get_text(shield_type, LANG, row, max_width):
     
     return text
 
-corel = win32com.client.gencache.EnsureDispatch("CorelDRAW.Application")
+corel = win32com.client.Dispatch("CorelDRAW.Application")
 
 def process_template(LANG, shield_type):
     LANG_RUS = 'инг' if LANG == 'eng' else 'рус'
@@ -83,27 +83,22 @@ def process_template(LANG, shield_type):
     if ONLY_WITH_SERIAL_NUMBERS:
         count = 0
         for index, row in data.iterrows():
-            if row['Serial number'] == row['Serial number']:
+            if row['Serial number'] == row['Serial number'] and row['Измеряемая среда'].find("/") != -1:
                 count += 1
 
 
     getTime()
     # Главный цикл
     ##############################################################################
-    # doc = corel.OpenDocument(cdr_file)
     counter = 0
     for index, row in data.iterrows():
-    # index = 0
-    # while counter < 10:
-    #     row = data.iloc[index*7]
-    #     index += 1
         tag_no = row['Instrument tag no']
 
-        if (row['Serial number'] == row['Serial number'] or not ONLY_WITH_SERIAL_NUMBERS):
+        if ((row['Serial number'] == row['Serial number'] or not ONLY_WITH_SERIAL_NUMBERS) and row['Измеряемая среда'].find("/") != -1):
             counter += 1
 
             doc = corel.OpenDocument(cdr_file)
-            
+
             found = False
             for page in doc.Pages:
                 for shape in page.Shapes:
@@ -120,32 +115,40 @@ def process_template(LANG, shield_type):
                         if shape.SizeWidth > MAX_TEXT_WIDTH:
                             raise Exception('shape.SizeWidth > MAX_TEXT_WIDTH !')
                         
-                        shape.Fill.ApplyNoFill()
-                        shape.Outline.Width = 0.003
-
                         found = True
             if found == False:
                 raise Exception('found == False!')
 
-            doc.ActivePage.Shapes.All().ConvertToCurves()
-            
             if shield_type == SHIELD_WITH_QR:
-
                 qr_tag_no = row['TAG номера для QR-codes (на QR-код наносить их!!!!)']
                 generate_qr_code(qr_tag_no)
                 
                 pyperclip.copy(os.path.join(f"{os.getcwd()}\qr_codes", f"{qr_tag_no}.svg"))
                 
                 input("Ожидание импорта QR кода...")
+
+            output_folder = f"{os.getcwd()}\PNG\Type {shield_type}\{LANG.upper()}"
+            pyperclip.copy(os.path.join(output_folder, f"{tag_no}_{shield_type_text}_{LANG}.png"))
+            input("Ожидание сохранения PNG...")
+
+            for page in doc.Pages:
+                for shape in page.Shapes:
+                    if shape.Type == 6:                        
+                        shape.Fill.ApplyNoFill()
+                        shape.Outline.Width = 0.003
+
+            doc.ActivePage.Shapes.All().ConvertToCurves()
             
+            if shield_type == SHIELD_WITH_QR:
                 for page in doc.Pages:
                     page.Shapes.First.SetPosition(1.8300354330708661, 0.5905511811023622)
                     page.Shapes.First.SetSize(1.1811023622047243, 1.1811023622047243)
                     page.Shapes.First.Fill.ApplyNoFill()
                     page.Shapes.First.Outline.Width = 0.003
 
+            output_folder = f"{os.getcwd()}\Type {shield_type}\{LANG.upper()}"
             pyperclip.copy(os.path.join(output_folder, f"{tag_no}_{shield_type_text}_{LANG}.ai"))
-            input("Ожидание сохранения файла...")
+            input("Ожидание сохранения AI...")
             # Закрытие файла
             ##############################################################################
             doc.Close()
@@ -156,7 +159,7 @@ def process_template(LANG, shield_type):
             # print("index: "+ str(index*7))
 
 corel.Visible = True
-process_template('rus', SHIELD_WITH_QR)
+# process_template('rus', SHIELD_WITH_QR)
 process_template('eng', SHIELD_WITH_QR)
 
 # process_template('rus', SHIELD_WITHOUT_QR)

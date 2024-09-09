@@ -24,7 +24,7 @@ def generate_qr_code(data):
 
 def wrap_text(text, max_width, strict_single_line=False, spaced_dashes_already_replaced=False):
     lines = []
-    words = re.split(r'( +|-)', text)
+    words = re.split(r'( +|-|/)', text)
 
     current_line = ""
     for i in range(0, len(words)):
