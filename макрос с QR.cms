@@ -1,6 +1,6 @@
 ﻿// RECORDED SCRIPT 04.09.2024
 // waitms correction
-$S_CORR = 100
+$S_CORR = 200
 
 WNDBUMP(wndfind("CorelDRAW"))
 waitms(300 + $S_CORR)

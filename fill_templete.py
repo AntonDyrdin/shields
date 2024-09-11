@@ -120,31 +120,32 @@ def process_template(LANG, shield_type):
                 raise Exception('found == False!')
 
             if shield_type == SHIELD_WITH_QR:
-                qr_tag_no = row['TAG номера для QR-codes (на QR-код наносить их!!!!)']
+                qr_tag_no = tag_no.replace('-','').replace(' ','')
                 generate_qr_code(qr_tag_no)
                 
                 pyperclip.copy(os.path.join(f"{os.getcwd()}\qr_codes", f"{qr_tag_no}.svg"))
                 
                 input("Ожидание импорта QR кода...")
 
+            if shield_type == SHIELD_WITH_QR:
+              for page in doc.Pages:
+                  page.Shapes.First.SetPosition(1.8300354330708661, 0.5905511811023622)
+                  page.Shapes.First.SetSize(1.1811023622047243, 1.1811023622047243)
+
             output_folder = f"{os.getcwd()}\PNG\Type {shield_type}\{LANG.upper()}"
             pyperclip.copy(os.path.join(output_folder, f"{tag_no}_{shield_type_text}_{LANG}.png"))
             input("Ожидание сохранения PNG...")
 
             for page in doc.Pages:
-                for shape in page.Shapes:
-                    if shape.Type == 6:                        
-                        shape.Fill.ApplyNoFill()
-                        shape.Outline.Width = 0.003
+              if shield_type == SHIELD_WITH_QR:
+                page.Shapes.First.Fill.ApplyNoFill()
+                page.Shapes.First.Outline.Width = 0.003
+              for shape in page.Shapes:
+                if shape.Type == 6:                        
+                  shape.Fill.ApplyNoFill()
+                  shape.Outline.Width = 0.003
 
             doc.ActivePage.Shapes.All().ConvertToCurves()
-            
-            if shield_type == SHIELD_WITH_QR:
-                for page in doc.Pages:
-                    page.Shapes.First.SetPosition(1.8300354330708661, 0.5905511811023622)
-                    page.Shapes.First.SetSize(1.1811023622047243, 1.1811023622047243)
-                    page.Shapes.First.Fill.ApplyNoFill()
-                    page.Shapes.First.Outline.Width = 0.003
 
             output_folder = f"{os.getcwd()}\Type {shield_type}\{LANG.upper()}"
             pyperclip.copy(os.path.join(output_folder, f"{tag_no}_{shield_type_text}_{LANG}.ai"))
@@ -159,7 +160,7 @@ def process_template(LANG, shield_type):
             # print("index: "+ str(index*7))
 
 corel.Visible = True
-# process_template('rus', SHIELD_WITH_QR)
+process_template('rus', SHIELD_WITH_QR)
 process_template('eng', SHIELD_WITH_QR)
 
 # process_template('rus', SHIELD_WITHOUT_QR)
