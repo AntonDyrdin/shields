@@ -3,7 +3,8 @@ import win32com.client
 import pandas as pd
 import os
 import pyperclip
-from utils import generate_qr_code, wrap_text
+from utils import generate_qr_code, wrap_text, wipe
+import socket
 
 LANG = 'eng'
 SHIELD_WITHOUT_QR = 1
@@ -83,7 +84,7 @@ def process_template(LANG, shield_type):
     if ONLY_WITH_SERIAL_NUMBERS:
         count = 0
         for index, row in data.iterrows():
-            if row['Serial number'] == row['Serial number'] and row['Измеряемая среда'].find("/") != -1:
+            if row['Serial number'] == row['Serial number']:
                 count += 1
 
 
@@ -91,11 +92,16 @@ def process_template(LANG, shield_type):
     # Главный цикл
     ##############################################################################
     counter = 0
+    ONLY_FIRST = 10
+    count = ONLY_FIRST if ONLY_FIRST != None else count
     for index, row in data.iterrows():
         tag_no = row['Instrument tag no']
 
-        if ((row['Serial number'] == row['Serial number'] or not ONLY_WITH_SERIAL_NUMBERS) and row['Измеряемая среда'].find("/") != -1):
+        if ((row['Serial number'] == row['Serial number'] or not ONLY_WITH_SERIAL_NUMBERS)):
             counter += 1
+            
+            if ONLY_FIRST != None and counter > ONLY_FIRST:
+              break
 
             doc = corel.OpenDocument(cdr_file)
 
@@ -125,7 +131,9 @@ def process_template(LANG, shield_type):
                 
                 pyperclip.copy(os.path.join(f"{os.getcwd()}\qr_codes", f"{qr_tag_no}.svg"))
                 
-                input("Ожидание импорта QR кода...")
+                print("Ожидание импорта QR кода...")
+                start_socket_server()
+                # input("Ожидание импорта QR кода...")
 
             if shield_type == SHIELD_WITH_QR:
               for page in doc.Pages:
@@ -134,7 +142,9 @@ def process_template(LANG, shield_type):
 
             output_folder = f"{os.getcwd()}\PNG\Type {shield_type}\{LANG.upper()}"
             pyperclip.copy(os.path.join(output_folder, f"{tag_no}_{shield_type_text}_{LANG}.png"))
-            input("Ожидание сохранения PNG...")
+            print("Ожидание сохранения PNG...")
+            start_socket_server()
+            # input("Ожидание сохранения PNG...")
 
             for page in doc.Pages:
               if shield_type == SHIELD_WITH_QR:
@@ -149,7 +159,9 @@ def process_template(LANG, shield_type):
 
             output_folder = f"{os.getcwd()}\Type {shield_type}\{LANG.upper()}"
             pyperclip.copy(os.path.join(output_folder, f"{tag_no}_{shield_type_text}_{LANG}.ai"))
-            input("Ожидание сохранения AI...")
+            print("Ожидание сохранения AI...")
+            start_socket_server()
+            # input("Ожидание сохранения AI...")
             # Закрытие файла
             ##############################################################################
             doc.Close()
@@ -158,6 +170,17 @@ def process_template(LANG, shield_type):
             # print(row['Instrument tag no'])
             # print(row['Instrument service'])
             # print("index: "+ str(index*7))
+
+def start_socket_server():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind(('localhost', 6400))  # Устанавливаем порт для приема данных
+    server_socket.listen(1)
+
+    conn, addr = server_socket.accept()
+    data = conn.recv(1024)
+    conn.close()
+
+wipe()
 
 corel.Visible = True
 process_template('rus', SHIELD_WITH_QR)

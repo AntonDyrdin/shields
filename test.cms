@@ -1,0 +1,1 @@
+EXECUTE("python", "./send_ok.py")

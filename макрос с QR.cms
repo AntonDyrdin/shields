@@ -1,70 +1,51 @@
 ﻿// RECORDED SCRIPT 04.09.2024
 // waitms correction
-$S_CORR = 200
+$S_CORR = 500
 
 WNDBUMP(wndfind("CorelDRAW"))
-waitms(300 + $S_CORR)
+waitms(200 + $S_CORR)
 keydown(#CTRL)
 keypress(#I)
 keyup(#CTRL)
 
-waitms(614 + $S_CORR)
-  KEYPRESS(#ENTER)
-waitms(100 + $S_CORR)
+waitms(500 + $S_CORR)
 
 keydown(#CTRL)
 keypress(#V)
 keyup(#CTRL)
 
-waitms(145 + $S_CORR)
+waitms(100 + $S_CORR)
   KEYPRESS(#ENTER)
-waitms(600 + $S_CORR)
+waitms(500 + $S_CORR)
   KEYPRESS(#ENTER)
-waitms(220 + $S_CORR)
 // QR добавлен
 
-WNDBUMP(wndfind("Code"))
-
-waitms(300 + $S_CORR)
-  KEYPRESS(#ENTER)
-waitms(100 + $S_CORR)
-
+EXECUTE("python", "./send_ok.py")
 // Подтверждён импорта QR кода.
 
 // сохранение ПНГ
 
-WNDBUMP(wndfind("CorelDRAW"))
-
-waitms(456 + $S_CORR)
+waitms(200 + $S_CORR)
 
 keydown(#CTRL)
 keypress(#E)
 keyup(#CTRL)
 
-waitms(671 + $S_CORR)
-  KEYPRESS(#ENTER)
-
-waitms(152 + $S_CORR)
+waitms(500 + $S_CORR)
 
 keydown(#CTRL)
 keypress(#V)
 keyup(#CTRL)
 
-waitms(320 + $S_CORR)
+waitms(100 + $S_CORR)
   KEYPRESS(#ENTER)
-waitms(3500 + $S_CORR)
+waitms(10000 + $S_CORR)
   KEYPRESS(#ENTER)
-waitms(620 + $S_CORR)
+waitms(300 + $S_CORR)
 
-WNDBUMP(wndfind("Code"))
-
-waitms(501 + $S_CORR)
-  KEYPRESS(#ENTER)
-waitms(52 + $S_CORR)
 // ПНГ сохранён
-
+EXECUTE("python", "./send_ok.py")
 // сохранение AI
-WNDBUMP(wndfind("CorelDRAW"))
 waitms(300 + $S_CORR)
   keyDown(#CTRL)
   keyDown(#SHIFT)
@@ -72,24 +53,22 @@ waitms(300 + $S_CORR)
   keyUp(#SHIFT)
   keyUp(#CTRL)
 
-waitms(455 + $S_CORR)
-KEYPRESS(#ENTER)
-waitms(264 + $S_CORR)
+waitms(500 + $S_CORR)
 
 keydown(#CTRL)
 keypress(#V)
 keyup(#CTRL)
 
-waitms(100 + $S_CORR)
+waitms(200 + $S_CORR)
 KEYPRESS(#TAB)
 
-waitms(100 + $S_CORR)
+waitms(200 + $S_CORR)
 KEYPRESS(#DOWN)
 
 waitms(250 + $S_CORR)
 KEYPRESS(#A)
 
-waitms(100 + $S_CORR)
+waitms(300 + $S_CORR)
 KEYPRESS(#ENTER)
 waitms(100 + $S_CORR)
 KEYPRESS(#ENTER)
@@ -100,7 +79,6 @@ waitms(600 + $S_CORR)
 
 waitms(300 + $S_CORR)
 
-WNDBUMP(wndfind("Code"))
-
-KEYPRESS(#ENTER)
-waitms(200 + $S_CORR)
+EXECUTE("python", "./send_ok.py")
+WNDBUMP(wndfind("CorelDRAW"))
+waitms(300 + $S_CORR)

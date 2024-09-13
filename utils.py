@@ -57,3 +57,22 @@ def wrap_text(text, max_width, strict_single_line=False, spaced_dashes_already_r
             return wrap_text(text.replace(' - ', '-'), max_width, True, spaced_dashes_already_replaced=True)
         
     return "\r".join(lines)
+
+
+def wipe():
+  for i in os.listdir('./Type 2/ENG/'):
+    os.remove('./Type 2/ENG/' + i)
+  for i in os.listdir('./Type 2/RUS/'):
+    os.remove('./Type 2/RUS/' + i)
+  for i in os.listdir('./Type 1/ENG/'):
+    os.remove('./Type 1/ENG/' + i)
+  for i in os.listdir('./Type 1/RUS/'):
+    os.remove('./Type 1/RUS/' + i)
+  for i in os.listdir('./PNG/Type 2/ENG/'):
+    os.remove('./PNG/Type 2/ENG/' + i)
+  for i in os.listdir('./PNG/Type 2/RUS/'):
+    os.remove('./PNG/Type 2/RUS/' + i)
+  for i in os.listdir('./PNG/Type 1/ENG/'):
+    os.remove('./PNG/Type 1/ENG/' + i)
+  for i in os.listdir('./PNG/Type 1/RUS/'):
+    os.remove('./PNG/Type 1/RUS/' + i)
