@@ -1,6 +1,6 @@
 ﻿// RECORDED SCRIPT 04.09.2024
 // waitms correction
-$S_CORR = 200
+$S_CORR = 600
 
 WNDBUMP(wndfind("CorelDRAW"))
 waitms(300 + $S_CORR)
@@ -15,9 +15,6 @@ keypress(#E)
 keyup(#CTRL)
 
 waitms(671 + $S_CORR)
-  KEYPRESS(#ENTER)
-
-waitms(152 + $S_CORR)
 
 keydown(#CTRL)
 keypress(#V)
@@ -46,8 +43,6 @@ waitms(300 + $S_CORR)
   keyUp(#CTRL)
 
 waitms(455 + $S_CORR)
-KEYPRESS(#ENTER)
-waitms(264 + $S_CORR)
 
 keydown(#CTRL)
 keypress(#V)
@@ -69,7 +64,7 @@ KEYPRESS(#ENTER)
 
 waitms(600 + $S_CORR)
 
-  lClick(1152,727)
+  lClick(960,600)
 
 waitms(300 + $S_CORR)
 

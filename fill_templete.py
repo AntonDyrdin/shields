@@ -69,13 +69,12 @@ def get_text(shield_type, LANG, row, max_width):
 
 corel = win32com.client.Dispatch("CorelDRAW.Application")
 
-def process_template(LANG, shield_type):
+def process_template(xlsx_file, LANG, shield_type):
     LANG_RUS = 'инг' if LANG == 'eng' else 'рус'
     shield_type_text = "small" if shield_type == SHIELD_WITH_QR else "big"
     MAX_TEXT_WIDTH = 4.330688976377953 if shield_type == SHIELD_WITHOUT_QR else 4.724389763779527
     
     cdr_file =  f"{os.getcwd()}\шильд тип {shield_type} {LANG_RUS}\шильд тип {shield_type} {LANG_RUS} ( текст еще не в кривых).cdr"
-    xlsx_file = "dataset.xlsx"
     output_folder = f"{os.getcwd()}\Type {shield_type}\{LANG.upper()}"
 
     data = pd.read_excel(xlsx_file)
@@ -83,7 +82,7 @@ def process_template(LANG, shield_type):
     if ONLY_WITH_SERIAL_NUMBERS:
         count = 0
         for index, row in data.iterrows():
-            if row['Serial number'] == row['Serial number'] and row['Измеряемая среда'].find("/") != -1:
+            if row['Serial number'] == row['Serial number']:
                 count += 1
 
 
@@ -94,8 +93,11 @@ def process_template(LANG, shield_type):
     for index, row in data.iterrows():
         tag_no = row['Instrument tag no']
 
-        if ((row['Serial number'] == row['Serial number'] or not ONLY_WITH_SERIAL_NUMBERS) and row['Измеряемая среда'].find("/") != -1):
+        if ((row['Serial number'] == row['Serial number'] or not ONLY_WITH_SERIAL_NUMBERS)):
             counter += 1
+            
+            # if counter > 10:
+            #     break
 
             doc = corel.OpenDocument(cdr_file)
 
@@ -160,8 +162,10 @@ def process_template(LANG, shield_type):
             # print("index: "+ str(index*7))
 
 corel.Visible = True
-process_template('rus', SHIELD_WITH_QR)
-process_template('eng', SHIELD_WITH_QR)
 
-# process_template('rus', SHIELD_WITHOUT_QR)
-# process_template('eng', SHIELD_WITHOUT_QR)
+dataset_file = "Шильды_Вариант_групп_2_часть_заполнено_ОТП_с_серийными_номерами.xlsx"
+process_template(dataset_file, 'rus', SHIELD_WITH_QR)
+# process_template(dataset_file, 'eng', SHIELD_WITH_QR)
+
+# process_template(dataset_file, 'rus', SHIELD_WITHOUT_QR)
+# process_template(dataset_file, 'eng', SHIELD_WITHOUT_QR)
